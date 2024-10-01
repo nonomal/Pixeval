@@ -43,6 +43,21 @@ public partial class IllustrationViewerPageViewModel : DetailedUiObservableObjec
     [ObservableProperty]
     private bool _showPixevalIcon = true;
 
+    [ObservableProperty]
+    private string _additionalText = string.Empty;
+
+    [ObservableProperty]
+    private bool _additionalTextBlockVisible = true;
+
+    [ObservableProperty]
+    private bool _upscalerProgressBarVisible;
+
+    [ObservableProperty]
+    private int _upscalerProgress;
+
+    [ObservableProperty]
+    private string? _upscalerProgressText;
+
     /// <summary>
     /// 
     /// </summary>
@@ -241,6 +256,11 @@ public partial class IllustrationViewerPageViewModel : DetailedUiObservableObjec
     #endregion
 
     #region Helper Functions
+
+    public string GetCurrentIllustrationDimensionText(int index)
+    {
+        return CurrentIllustration.DimensionText;
+    }
 
     public string? NextButtonText => NextButtonAction switch
     {

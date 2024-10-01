@@ -20,15 +20,12 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Pixeval.Controls.Windowing;
 using Pixeval.Database.Managers;
-using Pixeval.Download;
 using Pixeval.Util.IO;
 using Pixeval.Utilities;
 using WinUI3Utilities;
@@ -37,6 +34,7 @@ using Windows.ApplicationModel;
 using Microsoft.UI.Windowing;
 using Pixeval.CoreApi.Net;
 using Pixeval.Util.UI;
+using Microsoft.UI.Xaml.Media;
 
 namespace Pixeval.AppManagement;
 
@@ -60,15 +58,15 @@ public static partial class AppInfo
 
     public static bool CustomizeTitleBarSupported => AppWindowTitleBar.IsCustomizationSupported();
 
-    public static Task<SoftwareBitmapSource> ImageNotAvailable { get; } = GetImageNotAvailableStream().GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> ImageNotAvailable { get; } = GetImageNotAvailableStream().GetBitmapImageAsync(true, url: "Images/image-not-available.png");
 
     public static Stream GetImageNotAvailableStream() => GetAssetStream("Images/image-not-available.png");
 
-    public static Task<SoftwareBitmapSource> PixivNoProfile { get; } = GetPixivNoProfileStream().GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> PixivNoProfile { get; } = GetPixivNoProfileStream().GetBitmapImageAsync(true, url: "Images/pixiv_no_profile.png");
 
     public static Stream GetPixivNoProfileStream() => GetAssetStream("Images/pixiv_no_profile.png");
 
-    public static Task<SoftwareBitmapSource> Icon { get; } = GetAssetStream("Images/logo.ico").GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> Icon { get; } = GetAssetStream("Images/logo.ico").GetBitmapImageAsync(true, url: "Images/logo.ico");
 
     static AppInfo()
     {
@@ -92,7 +90,6 @@ public static partial class AppInfo
     public static string IconAbsolutePath => ApplicationUriToPath(new Uri(IconApplicationUri));
 
     public static Uri NavigationIconUri(string name) => new Uri($"ms-appx:///Assets/Images/Icons/{name}.png");
-
 
     public static string ApplicationUriToPath(Uri uri)
     {
@@ -119,7 +116,7 @@ public static partial class AppInfo
 
     public static Stream GetAssetStream(string relativeToAssetsFolder)
     {
-        return File.OpenRead(ApplicationUriToPath(new Uri($"ms-appx:///Assets/{relativeToAssetsFolder}")));
+        return IoHelper.OpenAsyncRead(ApplicationUriToPath(new Uri($"ms-appx:///Assets/{relativeToAssetsFolder}")));
     }
 
     public static async Task<byte[]> GetResourceBytesAsync(string path)

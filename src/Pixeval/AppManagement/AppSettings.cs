@@ -37,6 +37,7 @@ using WinUI3Utilities;
 using WinUI3Utilities.Attributes;
 using FluentIcons.Common;
 using Microsoft.Windows.Globalization;
+using Pixeval.Upscaling;
 using Pixeval.Utilities;
 using static Pixeval.SettingsPageResources;
 
@@ -130,7 +131,7 @@ public partial record AppSettings() : IWindowSettings
     public string ReverseSearchApiKey { get; set; } = "";
 
     [SettingsEntry(Symbol.Cookies, nameof(WebCookieEntryHeader), nameof(WebCookieEntryDescription))]
-    public string? WebCookie { get; set; }
+    public string WebCookie { get; set; } = "";
 
     [SettingsEntry(Symbol.TargetArrow, nameof(ReverseSearchResultSimilarityThresholdEntryHeader), nameof(ReverseSearchResultSimilarityThresholdEntryDescription))]
     public int ReverseSearchResultSimilarityThreshold { get; set; } = 80;
@@ -178,6 +179,17 @@ public partial record AppSettings() : IWindowSettings
 
     [AttributeIgnore(typeof(ResetAttribute))]
     public DateTimeOffset LastCheckedUpdate { get; set; } = DateTimeOffset.MinValue;
+
+    [SettingsEntry(Symbol.EyeTracking, nameof(UpscalerModelEntryHeader), nameof(UpscalerModelEntryDescription))]
+    public RealESRGANModel UpscalerModel { get; set; } = RealESRGANModel.RealESRGANX4Plus;
+
+    [SettingsEntry(Symbol.RatioOneToOne, nameof(UpscalerScaleRatioEntryHeader), nameof(UpscalerScaleRatioEntryDescription))]
+    public int UpscalerScaleRatio { get; set; } = 4;
+
+    [SettingsEntry(Symbol.ImageGlobe, nameof(UpscalerOutputTypeEntryHeader), nameof(UpscalerOutputTypeEntryDescription))]
+    public UpscalerOutputType UpscalerOutputType { get; set; } = UpscalerOutputType.Png;
+
+    public bool ShowUpscalerTeachingTip { get; set; } = true;
 
     [SettingsEntry(Symbol.Box, nameof(PixivNameResolverHeaderText), nameof(PixivNameResolverDescriptionText))]
     public string[] PixivAppApiNameResolver { get; set; } =

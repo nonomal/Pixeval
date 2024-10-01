@@ -29,10 +29,9 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.UI;
 using Pixeval.AppManagement;
+using WinUI3Utilities;
 
 namespace Pixeval.Pages.Capability.Feeds;
-
-
 
 public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewModel(new IFeedEntry.SparseFeedEntry(entry)), IFactory<Feed, FeedItemSparseViewModel>
 {
@@ -41,8 +40,8 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
 
     public override string PostUsername => entry.PostUsername ?? string.Empty;
 
-    // If the post date is within one day, show the precise moment, otherwise shows the date
-    // we make an optimistic assumption that user rarely view feeds over one year ago, so
+    // If the post date is within one day, show the precise moment, otherwise show only the date
+    // we make an optimistic assumption that the users will rarely view those feeds over one year ago, so
     // we don't show the year here.
     public override string PostDateFormatted =>
         (DateTime.Now - entry.PostDate) < TimeSpan.FromDays(1)
@@ -51,7 +50,7 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
 
     private ImageSource? _userAvatar;
 
-    // It's impossible to use [ObservableProperty] here, for that generated properties lack the `override` modifier
+    // It's impossible to use [ObservableProperty] here, for that the generated properties lack the `override` modifier
     // same for the ItemBackground property
     public override ImageSource UserAvatar
     {
@@ -67,7 +66,7 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
         set => SetProperty(ref _itemBackground, value);
     }
 
-    public static FeedItemSparseViewModel CreateInstance(Feed entry, int index)
+    public static FeedItemSparseViewModel CreateInstance(Feed entry)
     {
         return new FeedItemSparseViewModel(entry);
     }
@@ -84,7 +83,7 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
 
         if (entry.PostUserThumbnail is { } url)
         {
-            var image = (await App.AppViewModel.MakoClient.DownloadBitmapImageAsync(url, 35)).UnwrapOrElse(await AppInfo.ImageNotAvailable)!;
+            var image = (await App.AppViewModel.MakoClient.DownloadBitmapImageWithDesiredSizeAsync(url, 35)).UnwrapOrElse(await AppInfo.ImageNotAvailable)!;
             UserAvatar = image;
         }
         else
@@ -103,7 +102,7 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
         FeedType.AddBookmark or FeedType.PostIllust => MakoHelper.GenerateIllustrationAppUri(entry.Id),
         FeedType.AddFavorite => MakoHelper.GenerateUserAppUri(entry.Id),
         FeedType.AddNovelBookmark => MakoHelper.GenerateNovelAppUri(entry.Id),
-        _ => throw new ArgumentOutOfRangeException()
+        _ => ThrowHelper.ArgumentOutOfRange<FeedType?, Uri>(entry.Type)
     };
 
     public override Uri WebUri => entry.Type switch
@@ -111,7 +110,7 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
         FeedType.AddBookmark or FeedType.PostIllust => MakoHelper.GenerateIllustrationWebUri(entry.Id),
         FeedType.AddFavorite => MakoHelper.GenerateUserWebUri(entry.Id),
         FeedType.AddNovelBookmark => MakoHelper.GenerateNovelWebUri(entry.Id),
-        _ => throw new ArgumentOutOfRangeException()
+        _ => ThrowHelper.ArgumentOutOfRange<FeedType?, Uri>(entry.Type)
     };
 
     public override Uri PixEzUri => entry.Type switch
@@ -119,6 +118,6 @@ public partial class FeedItemSparseViewModel(Feed entry) : AbstractFeedItemViewM
         FeedType.AddBookmark or FeedType.PostIllust => MakoHelper.GenerateIllustrationPixEzUri(entry.Id),
         FeedType.AddFavorite => MakoHelper.GenerateUserPixEzUri(entry.Id),
         FeedType.AddNovelBookmark => MakoHelper.GenerateNovelPixEzUri(entry.Id),
-        _ => throw new ArgumentOutOfRangeException()
+        _ => ThrowHelper.ArgumentOutOfRange<FeedType?, Uri>(entry.Type)
     };
 }
