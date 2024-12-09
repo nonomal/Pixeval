@@ -35,7 +35,7 @@ namespace Pixeval.Controls;
 /// </summary>
 public partial class IllustrationItemViewModel : WorkEntryViewModel<Illustration>, IFactory<Illustration, IllustrationItemViewModel>
 {
-    public static IllustrationItemViewModel CreateInstance(Illustration entry, int _) => new(entry);
+    public static IllustrationItemViewModel CreateInstance(Illustration entry) => new(entry);
 
     public IllustrationItemViewModel(Illustration illustration) : base(illustration)
     {
@@ -45,7 +45,7 @@ public partial class IllustrationItemViewModel : WorkEntryViewModel<Illustration
         MangaSaveCommand.CanExecuteRequested += (_, e) => e.CanExecute = isManga;
         MangaSaveAsCommand.CanExecuteRequested += (_, e) => e.CanExecute = isManga;
         var id = illustration.Id;
-        UgoiraMetadata = App.AppViewModel.MakoClient.GetUgoiraMetadataAsync(id);
+        UgoiraMetadata = illustration.IsUgoira ? App.AppViewModel.MakoClient.GetUgoiraMetadataAsync(id) : Task.FromResult<UgoiraMetadataResponse>(null!);
     }
 
     /// <summary>
@@ -56,6 +56,12 @@ public partial class IllustrationItemViewModel : WorkEntryViewModel<Illustration
     public bool IsManga => Entry.IsManga;
 
     public bool IsUgoira => Entry.IsUgoira;
+
+    public int Width => Entry.Width;
+
+    public int Height => Entry.Height;
+
+    public double AspectRatio => (double)Width / Height;
 
     public Task<UgoiraMetadataResponse> UgoiraMetadata { get; }
 
@@ -72,6 +78,8 @@ public partial class IllustrationItemViewModel : WorkEntryViewModel<Illustration
     public IReadOnlyList<string> MangaOriginalUrls => Entry.MangaOriginalUrls;
 
     public List<string> UgoiraOriginalUrls => Entry.GetUgoiraOriginalUrls(UgoiraMetadata.Result.FrameCount);
+
+    public string DimensionText => $"{Entry.Width} x {Entry.Height}";
 
     public async ValueTask<List<string>> UgoiraOriginalUrlsAsync() => Entry.GetUgoiraOriginalUrls((await UgoiraMetadata).FrameCount);
 

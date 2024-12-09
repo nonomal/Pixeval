@@ -23,24 +23,27 @@ using System.IO;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Storage;
+using StorageFolder = Windows.Storage.StorageFolder;
+using StorageFile = Windows.Storage.StorageFile;
 using Pixeval.Util.IO;
+using ApplicationDataLocality = Microsoft.Windows.Storage.ApplicationDataLocality;
 
 namespace Pixeval.AppManagement;
 
 public class AppKnownFolders(StorageFolder self)
 {
-    public static AppKnownFolders Local = new(ApplicationData.Current.LocalFolder, _ => Task.CompletedTask);
+    public static AppKnownFolders Installation = null!;
+
+    public static AppKnownFolders Local = new(AppInfo.AppData.LocalFolder, _ => Task.CompletedTask);
 
     public static AppKnownFolders Log = null!;
 
     public static AppKnownFolders Cache = null!;
 
-    public static AppKnownFolders Roaming = new(ApplicationData.Current.RoamingFolder, _ => Task.CompletedTask);
-
     public static AppKnownFolders SavedWallPaper = null!;
 
-    public static AppKnownFolders Temporary = new(ApplicationData.Current.TemporaryFolder,
-        _ => ApplicationData.Current.ClearAsync(ApplicationDataLocality.Temporary).AsTask());
+    public static AppKnownFolders Temporary = new(AppInfo.AppData.TemporaryFolder,
+        _ => AppInfo.AppData.ClearAsync(ApplicationDataLocality.Temporary).AsTask());
 
     private readonly Func<StorageFolder, Task>? _deleter;
 
@@ -58,6 +61,7 @@ public class AppKnownFolders(StorageFolder self)
         SavedWallPaper = await GetOrCreate(Local, "Wallpapers");
         Log = await GetOrCreate(Local, "Logs");
         Cache = await GetOrCreate(Local, "Cache");
+        Installation = new AppKnownFolders(await StorageFolder.GetFolderFromPathAsync(Windows.ApplicationModel.Package.Current.InstalledPath));
     }
 
     /// <summary>

@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.UI;
 using Pixeval.AppManagement;
+using WinUI3Utilities;
 
 namespace Pixeval.Pages.Capability.Feeds;
 
@@ -36,11 +37,11 @@ public class FeedItemCondensedViewModel(List<Feed?> entries) : AbstractFeedItemV
         GC.SuppressFinalize(this);
     }
 
-    public override Uri AppUri => throw new NotSupportedException("AppUri is not supported for condensed feeds");
+    public override Uri AppUri => ThrowHelper.NotSupported<Uri>("AppUri is not supported for condensed feeds");
 
-    public override Uri WebUri => throw new NotSupportedException("WebUri is not supported for condensed feeds");
+    public override Uri WebUri => ThrowHelper.NotSupported<Uri>("WebUri is not supported for condensed feeds");
 
-    public override Uri PixEzUri => throw new NotSupportedException("PixEzUri is not supported for condensed feeds");
+    public override Uri PixEzUri => ThrowHelper.NotSupported<Uri>("PixEzUri is not supported for condensed feeds");
 
     private ImageSource? _userAvatar;
 
@@ -81,7 +82,7 @@ public class FeedItemCondensedViewModel(List<Feed?> entries) : AbstractFeedItemV
 
         if (entries[0]?.PostUserThumbnail is { Length: > 0 } url)
         {
-            var image = (await App.AppViewModel.MakoClient.DownloadBitmapImageAsync(url, 35)).UnwrapOrElse(await AppInfo.ImageNotAvailable)!;
+            var image = (await App.AppViewModel.MakoClient.DownloadBitmapImageWithDesiredSizeAsync(url, 35)).UnwrapOrElse(await AppInfo.ImageNotAvailable)!;
             UserAvatar = image;
         }
         else

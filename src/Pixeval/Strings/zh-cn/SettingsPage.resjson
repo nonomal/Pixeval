@@ -124,8 +124,6 @@
   "OpenTempEntry/Description": "此处存储的都是临时文件，每次打开软件时都会删除",
   "OpenLocalEntry/Header": "打开本地文件夹",
   "OpenLocalEntry/Description": "此处存储了重要的配置文件，请不要修改此处的文件",
-  "OpenRoamingEntry/Header": "打开漫游文件夹",
-  "OpenRoamingEntry/Description": "此处存储了重要的配置文件，请不要修改此处的文件",
   "ResetDefaultSettingsButton/Content": "重置设置",
   "ResetDefaultSettingsEntry/Description": "点击该按钮将会将所有设置重置会默认状态，该操作不可撤销",
   "ResetDefaultSettingsEntry/Header": "重置默认设置",
@@ -203,5 +201,12 @@
   "IfIllustMacroTooltip": "如果是图片，该宏会被替换为其参数",
   "IfNovelMacroTooltip": "如果是小说，该宏会被替换为其参数",
   "IfGifMacroTooltip": "如果是动图，该宏会被替换为其参数",
-  "MangaIndexMacroTooltip": "如果是漫画，该宏会被替换为当前图片在多图中的索引（第几张）；必须与 @{if_manga=} 宏配合使用，必须在文件名上使用"
+  "MangaIndexMacroTooltip": "如果是漫画，该宏会被替换为当前图片在多图中的索引（第几张）；必须与 @{if_manga=} 宏配合使用，必须在文件名上使用",
+  "AiUpscalerSettingsGroup/Text": "AI超分辨率",
+  "UpscalerModelEntry/Header": " AI超分辨率模型",
+  "UpscalerModelEntry/Description": "选择AI超分辨率模型，详见此处",
+  "UpscalerScaleRatioEntry/Header": "AI超分辨率倍率",
+  "UpscalerScaleRatioEntry/Description": "默认为4，注意过大的倍率可能导致生成的图片体积过大影响性能",
+  "UpscalerOutputTypeEntry/Header": "AI超分辨率生成图片的格式",
+  "UpscalerOutputTypeEntry/Description": "默认为PNG"
 }

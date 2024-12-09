@@ -20,15 +20,12 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Windows.Storage;
+using Microsoft.Windows.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Pixeval.Controls.Windowing;
 using Pixeval.Database.Managers;
-using Pixeval.Download;
 using Pixeval.Util.IO;
 using Pixeval.Utilities;
 using WinUI3Utilities;
@@ -37,6 +34,7 @@ using Windows.ApplicationModel;
 using Microsoft.UI.Windowing;
 using Pixeval.CoreApi.Net;
 using Pixeval.Util.UI;
+using Microsoft.UI.Xaml.Media;
 
 namespace Pixeval.AppManagement;
 
@@ -54,26 +52,26 @@ public static partial class AppInfo
 
     public const string IconApplicationUri = "ms-appx:///Assets/Images/logo.ico";
 
+    public static ApplicationData AppData { get; } = ApplicationData.GetDefault();
+
     public static readonly string DatabaseFilePath = AppKnownFolders.Local.Resolve("PixevalData4.2.2.litedb");
 
     public static Versioning AppVersion { get; } = new();
 
     public static bool CustomizeTitleBarSupported => AppWindowTitleBar.IsCustomizationSupported();
 
-    public static Task<SoftwareBitmapSource> ImageNotAvailable { get; } = GetImageNotAvailableStream().GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> ImageNotAvailable { get; } = GetImageNotAvailableStream().GetBitmapImageAsync(true, url: "Images/image-not-available.png");
 
     public static Stream GetImageNotAvailableStream() => GetAssetStream("Images/image-not-available.png");
 
-    public static Task<SoftwareBitmapSource> PixivNoProfile { get; } = GetPixivNoProfileStream().GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> PixivNoProfile { get; } = GetPixivNoProfileStream().GetBitmapImageAsync(true, url: "Images/pixiv_no_profile.png");
 
     public static Stream GetPixivNoProfileStream() => GetAssetStream("Images/pixiv_no_profile.png");
 
-    public static Task<SoftwareBitmapSource> Icon { get; } = GetAssetStream("Images/logo.ico").GetSoftwareBitmapSourceAsync(true);
+    public static Task<ImageSource> Icon { get; } = GetAssetStream("Images/logo.ico").GetBitmapImageAsync(true, url: "Images/logo.ico");
 
     static AppInfo()
     {
-        // Keys in the RoamingSettings will be synced through the devices of the same user
-        // For more detailed information see https://docs.microsoft.com/en-us/windows/apps/design/app-settings/store-and-retrieve-app-data
         InitializeConfig();
         InitializeLoginContext();
         InitializeDebugTrace();
@@ -92,7 +90,6 @@ public static partial class AppInfo
     public static string IconAbsolutePath => ApplicationUriToPath(new Uri(IconApplicationUri));
 
     public static Uri NavigationIconUri(string name) => new Uri($"ms-appx:///Assets/Images/Icons/{name}.png");
-
 
     public static string ApplicationUriToPath(Uri uri)
     {
@@ -119,7 +116,7 @@ public static partial class AppInfo
 
     public static Stream GetAssetStream(string relativeToAssetsFolder)
     {
-        return File.OpenRead(ApplicationUriToPath(new Uri($"ms-appx:///Assets/{relativeToAssetsFolder}")));
+        return IoHelper.OpenAsyncRead(ApplicationUriToPath(new Uri($"ms-appx:///Assets/{relativeToAssetsFolder}")));
     }
 
     public static async Task<byte[]> GetResourceBytesAsync(string path)
@@ -151,12 +148,12 @@ public static partial class AppInfo
 
     public static void ClearConfig()
     {
-        Functions.IgnoreException(() => ApplicationData.Current.RoamingSettings.DeleteContainer(ConfigContainerKey));
+        Functions.IgnoreException(() => AppData.LocalSettings.DeleteContainer(ConfigContainerKey));
     }
 
     public static void ClearLoginContext()
     {
-        Functions.IgnoreException(() => ApplicationData.Current.LocalSettings.DeleteContainer(LoginContextContainerKey));
+        Functions.IgnoreException(() => AppData.LocalSettings.DeleteContainer(LoginContextContainerKey));
     }
 
     public static void SaveContext()
